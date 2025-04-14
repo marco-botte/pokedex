@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"pokedex/internal/pokecache"
 )
 
 type cliCommand struct {
@@ -14,6 +15,7 @@ type cliCommand struct {
 type config struct {
 	Next     *string
 	Previous *string
+	Cache    *pokecache.Cache
 }
 
 var commMap map[string]cliCommand
@@ -39,7 +41,7 @@ func commandMap(conf *config) error {
 		fmt.Println("No further areas! Go back.")
 		return nil
 	}
-	locs, err := getLocs(*conf.Next)
+	locs, err := getLocs(*conf.Next, conf.Cache)
 	if err != nil {
 		return err
 	}
@@ -57,7 +59,7 @@ func commandMapBack(conf *config) error {
 		return nil
 	}
 
-	locs, err := getLocs(*conf.Previous)
+	locs, err := getLocs(*conf.Previous, conf.Cache)
 	if err != nil {
 		return err
 	}

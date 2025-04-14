@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"pokedex/internal/pokecache"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -31,10 +33,12 @@ func main() {
 			callback:    commandMapBack,
 		},
 	}
+	cache := pokecache.NewCache(time.Duration(20 * time.Second))
 	next := "https://pokeapi.co/api/v2/location-area/"
 	conf := config{
 		Next:     &next,
 		Previous: nil,
+		Cache:    cache,
 	}
 	for {
 
@@ -57,6 +61,7 @@ func main() {
 	if err := scanner.Err(); err != nil {
 		fmt.Fprintln(os.Stderr, "error reading input:", err)
 	}
+
 }
 
 func cleanInput(text string) []string {
