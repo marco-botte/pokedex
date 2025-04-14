@@ -11,6 +11,7 @@ import (
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
+	myPokeDex := map[string]string{}
 	commMap = map[string]cliCommand{
 		"exit": {
 			name:        "exit",
@@ -37,6 +38,11 @@ func main() {
 			description: "Show more information for the area you provide",
 			callback:    commandExplore,
 		},
+		"catch": {
+			name:        "catch",
+			description: "Throw a pokeball at the pokemon you provide",
+			callback:    commandCatch,
+		},
 	}
 
 	cache := pokecache.NewCache(time.Duration(20 * time.Second))
@@ -45,6 +51,7 @@ func main() {
 		Next:     &next,
 		Previous: nil,
 		Cache:    cache,
+		Pokedex:  &myPokeDex,
 	}
 	var args []string = nil
 	for {
@@ -75,5 +82,9 @@ func main() {
 }
 
 func cleanInput(text string) []string {
-	return strings.Fields(text)
+	words := strings.Fields(text)
+	for i, word := range words {
+		words[i] = strings.ToLower(word)
+	}
+	return words
 }

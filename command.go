@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"pokedex/internal/pokecache"
 )
@@ -16,6 +17,7 @@ type config struct {
 	Next     *string
 	Previous *string
 	Cache    *pokecache.Cache
+	Pokedex  *map[string]string
 }
 
 var commMap map[string]cliCommand
@@ -83,6 +85,33 @@ func commandExplore(conf *config, args ...string) error {
 	}
 	for _, encounter := range location.Encounters {
 		fmt.Println(encounter.Pokemon.Name)
+	}
+	return nil
+}
+
+func commandCatch(conf *config, args ...string) error {
+	if len(args) == 0 {
+		fmt.Println("Provide a pokemon to catch.")
+		return nil
+	}
+	pokemon_name := args[0]
+	pokemon, caught := (*conf.Pokedex)[pokemon_name]
+	if caught {
+		fmt.Printf("Already caught %s.\n", pokemon) // actual pokemon type useful?
+		return nil
+	}
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemon_name)
+	url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s/", pokemon_name)
+	pokemonExp, err := getData[PokemonExperience](url, conf.Cache)
+	if err != nil {
+		return err
+	}
+	chance := 0.7 - min(float64(pokemonExp.Experience), 200)/300
+	if chance > rand.Float64() {
+		fmt.Printf("caught %s!\n", pokemon_name)
+		(*conf.Pokedex)[pokemon_name] = pokemon_name // actual pokemon type useful?
+	} else {
+		fmt.Printf("%s got away.\n", pokemon_name)
 	}
 	return nil
 }
