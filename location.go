@@ -2,25 +2,31 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"pokedex/internal/pokecache"
 )
 
-type Location struct {
+type LocationResponse struct {
+	Encounters []struct {
+		Pokemon struct {
+			Name string `json:"name"`
+		} `json:"pokemon"`
+	} `json:"pokemon_encounters"`
+}
+type LocationRef struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
 }
 
 type LocAreaResponse struct {
-	Next     *string    `json:"next"`
-	Previous *string    `json:"previous"`
-	Results  []Location `json:"results"`
+	Next     *string       `json:"next"`
+	Previous *string       `json:"previous"`
+	Results  []LocationRef `json:"results"`
 }
 
-func getLocs(url string, cache *pokecache.Cache) (*LocAreaResponse, error) {
+func getData[T any](url string, cache *pokecache.Cache) (*T, error) {
 	body, cached := cache.Get(url)
 	if !cached {
 		res, err := http.Get(url)
@@ -40,14 +46,11 @@ func getLocs(url string, cache *pokecache.Cache) (*LocAreaResponse, error) {
 		}
 		cache.Add(url, body)
 	}
-	var locs LocAreaResponse
-	err := json.Unmarshal(body, &locs)
+	var result T
+	err := json.Unmarshal(body, &result)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
 	}
-	for _, loc := range locs.Results {
-		fmt.Println(loc.Name)
-	}
-	return &locs, nil
+	return &result, nil
 }
