@@ -20,8 +20,24 @@ func main() {
 			description: "Displays a help message",
 			callback:    commandHelp,
 		},
+		"map": {
+			name:        "map",
+			description: "Shows the next 20 areas",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Shows the previous 20 areas",
+			callback:    commandMapBack,
+		},
+	}
+	next := "https://pokeapi.co/api/v2/location-area/"
+	conf := config{
+		Next:     &next,
+		Previous: nil,
 	}
 	for {
+
 		fmt.Print("Pokedex > ")
 		if !scanner.Scan() {
 			break
@@ -36,7 +52,7 @@ func main() {
 			fmt.Println("Unknown command")
 			continue
 		}
-		command.callback()
+		command.callback(&conf)
 	}
 	if err := scanner.Err(); err != nil {
 		fmt.Fprintln(os.Stderr, "error reading input:", err)
