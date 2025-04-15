@@ -38,6 +38,11 @@ func main() {
 			description: "Inspect a pokemon you've already caught",
 			callback:    commandInspect,
 		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "Lists all pokemon you've already caught",
+			callback:    commandPokedex,
+		},
 	}
 	PokeREPL(myPokeDex, commMap)
 }
