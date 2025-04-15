@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func PokeREPL(myPokeDex map[string]string, commands map[string]cliCommand) {
+func PokeREPL(myPokeDex map[string]Pokemon, commands map[string]cliCommand) {
 	cache := pokecache.NewCache(time.Duration(20 * time.Second))
 	next := "https://pokeapi.co/api/v2/location-area/"
 	conf := config{

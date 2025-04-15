@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -22,11 +24,12 @@ type Type struct {
 }
 
 type Pokemon struct {
-	Name   string `json:"-"`
-	Height int    `json:"height"`
-	Weight int    `json:"weight"`
-	Stats  []Stat `json:"stats"`
-	Types  []Type `json:"types"`
+	Name       string `json:"-"`
+	Experience int    `json:"base_experience"`
+	Height     int    `json:"height"`
+	Weight     int    `json:"weight"`
+	Stats      []Stat `json:"stats"`
+	Types      []Type `json:"types"`
 }
 
 type PokemonExperience struct {
@@ -65,8 +68,10 @@ func getData[T any](url string, cache *pokecache.Cache) (*T, error) {
 			log.Fatal(err)
 			return nil, err
 		}
+		// handle this case gracefully, happens on any non existing URL (which are built from user input)
 		if res.StatusCode > 299 {
-			log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+			msg := fmt.Sprintf("Response failed with status code: %d\nbody: %s\n", res.StatusCode, body)
+			err = errors.New(msg)
 			return nil, err
 		}
 		cache.Add(url, body)

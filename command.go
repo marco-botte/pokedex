@@ -17,7 +17,7 @@ type config struct {
 	Next     *string
 	Previous *string
 	Cache    *pokecache.Cache
-	Pokedex  *map[string]string
+	Pokedex  *map[string]Pokemon
 }
 
 var commMap map[string]cliCommand
@@ -97,19 +97,21 @@ func commandCatch(conf *config, args ...string) error {
 	pokemon_name := args[0]
 	pokemon, caught := (*conf.Pokedex)[pokemon_name]
 	if caught {
-		fmt.Printf("Already caught %s.\n", pokemon) // actual pokemon type useful?
+		fmt.Printf("Already caught %s.\n", pokemon.Name)
 		return nil
 	}
 	fmt.Printf("Throwing a Pokeball at %s...\n", pokemon_name)
 	url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s/", pokemon_name)
-	pokemonExp, err := getData[PokemonExperience](url, conf.Cache)
+	poke_ptr, err := getData[Pokemon](url, conf.Cache)
 	if err != nil {
+		// gracefully handling 404
+		fmt.Printf("Cannot catch %s. Check for typos.\n", pokemon_name)
 		return err
 	}
-	chance := 0.7 - min(float64(pokemonExp.Experience), 200)/300
+	chance := 0.7 - min(float64(poke_ptr.Experience), 200)/300
 	if chance > rand.Float64() {
 		fmt.Printf("caught %s!\n", pokemon_name)
-		(*conf.Pokedex)[pokemon_name] = pokemon_name // actual pokemon type useful?
+		(*conf.Pokedex)[pokemon_name] = *poke_ptr
 	} else {
 		fmt.Printf("%s got away.\n", pokemon_name)
 	}
@@ -122,27 +124,29 @@ func commandInspect(conf *config, args ...string) error {
 		return nil
 	}
 	pokemon_name := args[0]
-	poke, caught := (*conf.Pokedex)[pokemon_name]
+	_, caught := (*conf.Pokedex)[pokemon_name]
 	if !caught {
-		fmt.Printf("%s not caught yet.\n", poke) // actual pokemon type useful?
+		fmt.Printf("%s not caught yet.\n", pokemon_name)
 		return nil
 	}
 	url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s/", pokemon_name)
-	pokemon, err := getData[Pokemon](url, conf.Cache)
+	poke_ptr, err := getData[Pokemon](url, conf.Cache)
 	if err != nil {
+		// gracefully handling 404 - but non existing pokemon are never caught
+		fmt.Printf("Cannot inspect %s. Check for typos.\n", pokemon_name)
 		return err
 	}
-	pokemon.Name = pokemon_name
+	poke_ptr.Name = pokemon_name
 
-	fmt.Printf("Name: %s\n", pokemon.Name)
-	fmt.Printf("Height: %d\n", pokemon.Height)
-	fmt.Printf("Weight: %d\n", pokemon.Weight)
+	fmt.Printf("Name: %s\n", poke_ptr.Name)
+	fmt.Printf("Height: %d\n", poke_ptr.Height)
+	fmt.Printf("Weight: %d\n", poke_ptr.Weight)
 	fmt.Println("Stats:")
-	for _, stat := range pokemon.Stats {
+	for _, stat := range poke_ptr.Stats {
 		fmt.Printf("  -%s: %d\n", stat.Stat.Name, stat.BaseStat)
 	}
 	fmt.Println("Types:")
-	for _, t := range pokemon.Types {
+	for _, t := range poke_ptr.Types {
 		fmt.Printf("  - %s\n", t.Type.Name)
 	}
 	return nil

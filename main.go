@@ -1,7 +1,7 @@
 package main
 
 func main() {
-	myPokeDex := map[string]string{}
+	myPokeDex := map[string]Pokemon{}
 	commMap = map[string]cliCommand{
 		"exit": {
 			name:        "exit\t",
