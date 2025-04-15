@@ -10,44 +10,42 @@ import (
 	"pokedex/internal/pokecache"
 )
 
-type Stat struct {
-	BaseStat int `json:"base_stat"`
-	Stat     struct {
-		Name string `json:"name"`
-	} `json:"stat"`
-}
-
-type Type struct {
-	Type struct {
-		Name string `json:"name"`
-	} `json:"type"`
-}
-
 type Pokemon struct {
-	Name       string `json:"-"`
-	Experience int    `json:"base_experience"`
-	Height     int    `json:"height"`
-	Weight     int    `json:"weight"`
-	Stats      []Stat `json:"stats"`
-	Types      []Type `json:"types"`
+	Name       string        `json:"-"`
+	Experience int           `json:"base_experience"`
+	Height     int           `json:"height"`
+	Weight     int           `json:"weight"`
+	Stats      []PokemonStat `json:"stats"`
+	Types      []PokemonType `json:"types"`
 }
 
-type LocationResponse struct {
-	Encounters []struct {
-		Pokemon struct {
-			Name string `json:"name"`
-		} `json:"pokemon"`
-	} `json:"pokemon_encounters"`
+type PokemonStat struct {
+	BaseStat int              `json:"base_stat"`
+	Stat     NamedAPIResource `json:"stat"`
 }
-type LocationRef struct {
+
+type PokemonType struct {
+	Slot int              `json:"slot,omitempty"`
+	Type NamedAPIResource `json:"type"`
+}
+
+type NamedAPIResource struct {
 	Name string `json:"name"`
-	URL  string `json:"url"`
+	URL  string `json:"url,omitempty"`
 }
 
-type LocAreaResponse struct {
-	Next     *string       `json:"next"`
-	Previous *string       `json:"previous"`
-	Results  []LocationRef `json:"results"`
+type LocationAreaList struct {
+	Next     *string            `json:"next"`
+	Previous *string            `json:"previous"`
+	Results  []NamedAPIResource `json:"results"`
+}
+
+type LocationEncounters struct {
+	Encounters []PokemonEncounter `json:"pokemon_encounters"`
+}
+
+type PokemonEncounter struct {
+	Pokemon NamedAPIResource `json:"pokemon"`
 }
 
 func getData[T any](url string, cache *pokecache.Cache) (*T, error) {

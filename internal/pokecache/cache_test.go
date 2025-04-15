@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func TestSomething(t *testing.T) {
+func TestCacheMethods(t *testing.T) {
 	cache := NewCache(10 * time.Millisecond)
 	key := "test"
 	val := []byte("pikaaaaa")

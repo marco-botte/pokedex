@@ -43,7 +43,7 @@ func commandMap(conf *config, args ...string) error {
 		fmt.Println("No further areas! Go back.")
 		return nil
 	}
-	locs, err := getData[LocAreaResponse](*conf.Next, conf.Cache)
+	locs, err := getData[LocationAreaList](*conf.Next, conf.Cache)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func commandMapBack(conf *config, args ...string) error {
 		return nil
 	}
 
-	locs, err := getData[LocAreaResponse](*conf.Previous, conf.Cache)
+	locs, err := getData[LocationAreaList](*conf.Previous, conf.Cache)
 	if err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func commandExplore(conf *config, args ...string) error {
 		return nil
 	}
 	url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%s/", args[0])
-	location, err := getData[LocationResponse](url, conf.Cache)
+	location, err := getData[LocationEncounters](url, conf.Cache)
 	if err != nil {
 		return err
 	}
