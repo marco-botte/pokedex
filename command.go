@@ -115,3 +115,35 @@ func commandCatch(conf *config, args ...string) error {
 	}
 	return nil
 }
+
+func commandInspect(conf *config, args ...string) error {
+	if len(args) == 0 {
+		fmt.Println("Provide a pokemon to inspect.")
+		return nil
+	}
+	pokemon_name := args[0]
+	poke, caught := (*conf.Pokedex)[pokemon_name]
+	if !caught {
+		fmt.Printf("%s not caught yet.\n", poke) // actual pokemon type useful?
+		return nil
+	}
+	url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s/", pokemon_name)
+	pokemon, err := getData[Pokemon](url, conf.Cache)
+	if err != nil {
+		return err
+	}
+	pokemon.Name = pokemon_name
+
+	fmt.Printf("Name: %s\n", pokemon.Name)
+	fmt.Printf("Height: %d\n", pokemon.Height)
+	fmt.Printf("Weight: %d\n", pokemon.Weight)
+	fmt.Println("Stats:")
+	for _, stat := range pokemon.Stats {
+		fmt.Printf("  -%s: %d\n", stat.Stat.Name, stat.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, t := range pokemon.Types {
+		fmt.Printf("  - %s\n", t.Type.Name)
+	}
+	return nil
+}

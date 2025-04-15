@@ -43,6 +43,11 @@ func main() {
 			description: "Throw a pokeball at the pokemon you provide",
 			callback:    commandCatch,
 		},
+		"inspect": {
+			name:        "inspect",
+			description: "Inspect a pokemon you've already caught",
+			callback:    commandInspect,
+		},
 	}
 
 	cache := pokecache.NewCache(time.Duration(20 * time.Second))

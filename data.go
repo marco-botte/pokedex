@@ -8,6 +8,27 @@ import (
 	"pokedex/internal/pokecache"
 )
 
+type Stat struct {
+	BaseStat int `json:"base_stat"`
+	Stat     struct {
+		Name string `json:"name"`
+	} `json:"stat"`
+}
+
+type Type struct {
+	Type struct {
+		Name string `json:"name"`
+	} `json:"type"`
+}
+
+type Pokemon struct {
+	Name   string `json:"-"`
+	Height int    `json:"height"`
+	Weight int    `json:"weight"`
+	Stats  []Stat `json:"stats"`
+	Types  []Type `json:"types"`
+}
+
 type PokemonExperience struct {
 	Experience int `json:"base_experience"`
 }
