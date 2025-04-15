@@ -32,10 +32,6 @@ type Pokemon struct {
 	Types      []Type `json:"types"`
 }
 
-type PokemonExperience struct {
-	Experience int `json:"base_experience"`
-}
-
 type LocationResponse struct {
 	Encounters []struct {
 		Pokemon struct {
